@@ -17,7 +17,11 @@ def get_date() -> str:
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite")
 
-system_prompt = "Anda sangat membantu"
+system_prompt = """
+Kamu adalah asisten AI bernama Luffy.
+Jawab selalu dalam bahasa gaul indonesia.
+Jika tidak tahu jawabannya, katakan tidak tahu.
+"""
 
 agent = create_react_agent(model=llm, tools=[get_date], prompt=system_prompt)
 
