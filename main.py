@@ -2,24 +2,27 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.agents import create_agent
+from langchain.tools import tool
+from langgraph.prebuilt import create_react_agent
 
 load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-def get_date():
-    """ tampilkan tanggal hari ini """
-    return datetime.now().strftime("%y-%m-%d")
+
+@tool
+def get_date() -> str:
+    """Tampilkan tanggal hari ini."""
+    return datetime.now().strftime("%Y-%m-%d")
 
 
-llm = ChatGoogleGenerativeAI(model = "gemini-3-flash-preview")
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite")
 
-system_prompt = """
-Anda sangat membantu 
-"""
+system_prompt = "Anda sangat membantu"
 
+agent = create_react_agent(model=llm, tools=[get_date], prompt=system_prompt)
 
-agent = create_agent(model=llm, tools=[get_date], system_prompt=system_prompt)
 user_query = input("Masukan pertanyaan: ")
 
-agent.invoke = ({"message":[{"role": "user", "content": user_query}]})
+response = agent.invoke({"messages": [{"role": "user", "content": user_query}]})
+
+print(response["messages"][-1].content)
